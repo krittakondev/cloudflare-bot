@@ -63,10 +63,10 @@ class CloudFlare {
             const resp = await axios.post(this.endpoint+"/v4/zones", {
                 name: domain,
                 account:{
-                    // id: this.id
-                    id: "81d917f3ed537338a2ef9e1622e40c25"
+                    id: this.id
+                    // id: "81d917f3ed537338a2ef9e1622e40c25"
 
-                }
+                },
             },{
                 headers: {
                     // 'X-Auth-Email': 'Spprtpdev@gmail.com',

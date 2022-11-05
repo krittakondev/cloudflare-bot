@@ -16,7 +16,14 @@ const Cloudflare_1 = __importDefault(require("./Cloudflare"));
 require("dotenv").config();
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const CN = new Cloudflare_1.default("81d917f3ed537338a2ef9e1622e40c25", process.env.CLOUDFLARE_TOKEN, () => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(yield CN.createZone("test.com"));
+        const create_zone = yield CN.createZone("test.com");
+        if (create_zone.success) {
+            const domain = create_zone.result.name;
+            const name_servers = create_zone.result.name_servers;
+            console.log({ domain });
+            console.log({ name_servers });
+            // console.log(create_zone)
+        }
         // console.log(await CN.getAccounts())
     }));
 }))();
