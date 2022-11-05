@@ -1,0 +1,20 @@
+{
+  "name": "cloudflare-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist",
+    "clean": "rm -rf dist",
+    "build": "tsc",
+    "clean:build": "npm run clean && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^18.11.9",
+    "dotenv": "^16.0.3"
+  }
+}
