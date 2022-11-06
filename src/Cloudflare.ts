@@ -1,4 +1,4 @@
-import axios, {AxiosHeaders, AxiosRequestHeaders} from 'axios'
+import axios, {AxiosHeaders, AxiosRequestHeaders, AxiosError} from 'axios'
 
 
 interface iHeaders {
@@ -75,7 +75,7 @@ class CloudFlare {
                 }
             })
             return resp.data
-        }catch(err){
+        }catch(err: any){
             if(!err?.response?.data){
                 throw err
             }
@@ -96,7 +96,7 @@ class CloudFlare {
                 }
             })
             return resp.data
-        }catch(err){
+        }catch(err: any){
             if(!err?.response?.data){
                 throw err
             }
@@ -114,7 +114,7 @@ class CloudFlare {
                 }
             })
             return resp.data
-        }catch(err){
+        }catch(err: any){
             if(!err?.response?.data){
                 throw err
             }
@@ -132,7 +132,7 @@ class CloudFlare {
                 }
             })
             return resp.data
-        }catch(err){
+        }catch(err: any){
             if(!err?.response?.data){
                 throw err
             }
