@@ -14,27 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 class CloudFlare {
-    constructor(account_id, token = "", callback = () => { }) {
+    constructor(account_id, email = "", auth_key, callback = () => { }) {
         this.endpoint = "https://api.cloudflare.com/client";
-        this.id = "";
-        this.id = account_id;
-        this.token = token;
-        this.checkToken().then((result) => {
-            if (!result) {
-                throw "token ผิดพลาด";
-            }
-            callback();
-        });
+        this.account_id = account_id;
+        this.email = email;
+        this.auth_key = auth_key;
+        callback();
     }
     checkToken() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.token) {
+            if (!this.auth_key || !this.email) {
                 return false;
             }
             try {
                 const resp = yield axios_1.default.get(this.endpoint + "/v4/user/tokens/verify", {
                     headers: {
-                        "Authorization": "Bearer " + this.token
+                        // "Authorization": "Bearer "+this.token
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key
                     }
                 });
                 if (resp.data.success) {
@@ -56,13 +53,14 @@ class CloudFlare {
                 const resp = yield axios_1.default.post(this.endpoint + "/v4/zones", {
                     name: domain,
                     account: {
-                        id: this.id
+                        id: this.account_id
                         // id: "81d917f3ed537338a2ef9e1622e40c25"
                     },
                 }, {
                     headers: {
-                        // 'X-Auth-Email': 'Spprtpdev@gmail.com',
-                        "Authorization": "Bearer " + this.token,
+                        // "Authorization": "Bearer "+this.token,
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
                         'Content-Type': "application/json"
                     }
                 });
@@ -82,7 +80,8 @@ class CloudFlare {
             try {
                 const resp = yield axios_1.default.get(this.endpoint + "/v4/zones", {
                     headers: {
-                        "Authorization": "Bearer " + this.token,
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
                         'Content-Type': "application/json"
                     }
                 });
@@ -102,7 +101,8 @@ class CloudFlare {
             try {
                 const resp = yield axios_1.default.get(this.endpoint + "/v4/user/tokens/permission_groups", {
                     headers: {
-                        "Authorization": "Bearer " + this.token,
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
                         'Content-Type': "application/json"
                     }
                 });
@@ -122,7 +122,151 @@ class CloudFlare {
             try {
                 const resp = yield axios_1.default.get(this.endpoint + "/v4/accounts", {
                     headers: {
-                        "Authorization": "Bearer " + this.token,
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
+                        'Content-Type': "application/json"
+                    }
+                });
+                return resp.data;
+            }
+            catch (err) {
+                if (!((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data)) {
+                    throw err;
+                }
+                return err.response.data;
+            }
+        });
+    }
+    updateDnsRecords(zone_id, record_id, name = "@", ip) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resp = yield axios_1.default.put(this.endpoint + `/v4/zones/${zone_id}/dns_records/${record_id}`, {
+                    "type": "A",
+                    "name": name,
+                    "content": ip,
+                    "ttl": 3600,
+                    "proxied": true
+                }, {
+                    headers: {
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
+                        'Content-Type': "application/json"
+                    }
+                });
+                return resp.data;
+            }
+            catch (err) {
+                if (!((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data)) {
+                    throw err;
+                }
+                return err.response.data;
+            }
+        });
+    }
+    getDnsRecordsList(zone_id) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resp = yield axios_1.default.get(this.endpoint + `/v4/zones/${zone_id}/dns_records`, {
+                    headers: {
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
+                        'Content-Type': "application/json"
+                    }
+                });
+                return resp.data;
+            }
+            catch (err) {
+                if (!((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data)) {
+                    throw err;
+                }
+                return err.response.data;
+            }
+        });
+    }
+    delDnsRecord(zone_id, id_record) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resp = yield axios_1.default.delete(this.endpoint + `/v4/zones/${zone_id}/dns_records/${id_record}`, {
+                    headers: {
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
+                        'Content-Type': "application/json"
+                    }
+                });
+                return resp.data;
+            }
+            catch (err) {
+                if (!((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data)) {
+                    throw err;
+                }
+                return err.response.data;
+            }
+        });
+    }
+    createDnsRecords(zone_id, name = "@", ip) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resp = yield axios_1.default.post(this.endpoint + `/v4/zones/${zone_id}/dns_records`, {
+                    "type": "A",
+                    "name": name,
+                    "content": ip,
+                    // "ttl":3600,
+                    // "priority":10,
+                    "proxied": true
+                }, {
+                    headers: {
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
+                        'Content-Type': "application/json"
+                    }
+                });
+                return resp.data;
+            }
+            catch (err) {
+                if (!((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data)) {
+                    throw err;
+                }
+                return err.response.data;
+            }
+        });
+    }
+    setSSL_TLS(zone_id, value = "flexible") {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resp = yield axios_1.default.patch(this.endpoint + `/v4/zones/${zone_id}/settings/ssl`, {
+                    value
+                }, {
+                    headers: {
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
+                        'Content-Type': "application/json"
+                    }
+                });
+                return resp.data;
+            }
+            catch (err) {
+                if (!((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data)) {
+                    throw err;
+                }
+                return err.response.data;
+            }
+        });
+    }
+    setAlwaysUseHTTPS(zone_id, value = "on") {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resp = yield axios_1.default.patch(this.endpoint + `/v4/zones/${zone_id}/settings/always_use_https`, {
+                    value
+                }, {
+                    headers: {
+                        "X-Auth-Email": this.email,
+                        "X-Auth-Key": this.auth_key,
                         'Content-Type': "application/json"
                     }
                 });
