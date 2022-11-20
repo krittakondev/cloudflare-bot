@@ -7,7 +7,7 @@ require("dotenv").config();
 
 
 (async () => {
-    const CN = new CloudFlare(process.env.CLOUDFLARE_ACCOUNT_ID, process.env.CLOUDFLARE_EMAIL, process.env.CLOUDFLARE_KEY,async ()=>{
+    const CN = new CloudFlare(process.env.CLOUDFLARE_ACCOUNT_ID || "", process.env.CLOUDFLARE_EMAIL || "", process.env.CLOUDFLARE_KEY || "",async ()=>{
     })
     const readData:string = fs.readFileSync("./data.txt", "utf8")
     const split_list: string[] = readData.split("\n")
@@ -15,13 +15,12 @@ require("dotenv").config();
         const t_split = val.split("\t")
         const domain: string = t_split[0].trim()
         const ip: string = t_split[1].trim()
-        console.log({domain})
 
         const create_zone = await CN.createZone(domain)
         // console.log(create_zone)
         if(create_zone.success){
             const { name_servers, id: zone_id } = create_zone.result;
-
+            console.log({domain})
             console.log({name_servers})
             const dns_records = await CN.getDnsRecordsList(zone_id)
             if(dns_records.success){
@@ -42,6 +41,7 @@ require("dotenv").config();
         }else if(create_zone.success === false){
             const { errors } = create_zone
             errors.forEach((val: any)=>{
+                console.log({domain})
                 console.log(val.message)
             })
 

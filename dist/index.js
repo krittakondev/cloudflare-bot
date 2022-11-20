@@ -16,7 +16,7 @@ const Cloudflare_1 = __importDefault(require("./Cloudflare"));
 const fs_1 = __importDefault(require("fs"));
 require("dotenv").config();
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const CN = new Cloudflare_1.default(process.env.CLOUDFLARE_ACCOUNT_ID, process.env.CLOUDFLARE_EMAIL, process.env.CLOUDFLARE_KEY, () => __awaiter(void 0, void 0, void 0, function* () {
+    const CN = new Cloudflare_1.default(process.env.CLOUDFLARE_ACCOUNT_ID || "", process.env.CLOUDFLARE_EMAIL || "", process.env.CLOUDFLARE_KEY || "", () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     const readData = fs_1.default.readFileSync("./data.txt", "utf8");
     const split_list = readData.split("\n");
@@ -24,11 +24,11 @@ require("dotenv").config();
         const t_split = val.split("\t");
         const domain = t_split[0].trim();
         const ip = t_split[1].trim();
-        console.log({ domain });
         const create_zone = yield CN.createZone(domain);
         // console.log(create_zone)
         if (create_zone.success) {
             const { name_servers, id: zone_id } = create_zone.result;
+            console.log({ domain });
             console.log({ name_servers });
             const dns_records = yield CN.getDnsRecordsList(zone_id);
             if (dns_records.success) {
@@ -48,6 +48,7 @@ require("dotenv").config();
         else if (create_zone.success === false) {
             const { errors } = create_zone;
             errors.forEach((val) => {
+                console.log({ domain });
                 console.log(val.message);
             });
         }
